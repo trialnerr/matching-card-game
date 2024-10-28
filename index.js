@@ -46,8 +46,6 @@ function checkAndResetClickedButtons() {
 
 }
 
-// console.log(checkEquality(2, 4)); 
-
 function generateBoard() {
   const board = document.querySelector('.board');
   for (let i = 0; i < N; i++) {
@@ -66,12 +64,13 @@ function handleButtonClick(e) {
   const id = e.target.id; 
   clickedButtons.push(e); 
   console.log(clickedButtons);
-  checkAndResetClickedButtons(); 
+  checkAndResetClickedButtons();
+  console.log(hidden);
   if (hidden === N) {
-    console.log( 'You matched them all!')
+    console.log('You matched them all!')
+    document.querySelector('.hasWon').textContent = 'You matched them all!';
   }
   return e.target.id; 
-
 }
 
 function main() {

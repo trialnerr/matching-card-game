@@ -20,57 +20,90 @@ console.log(currShuffle)
 //if there is a match remove them from the dom
 //if not do nothing (for now)
 function checkEquality(a, b) {
-  console.log(a, b);
-  const aId = a.target.id; 
-  const bId = b.target.id; 
-  const match = currShuffle[aId] === currShuffle[bId];
+  console.log(a, b)
+  const firstId = a.id; 
+  const secondId = b.id; 
+
+  const match = currShuffle[firstId] === currShuffle[secondId];
   if (match) {
-    a.target.classList.add('hidden'); 
-    b.target.classList.add('hidden'); 
+    console.log('match!')
+    a.childNodes.forEach(child => child.classList.add('hidden'))
+    b.childNodes.forEach(child => child.classList.add('hidden'))
     hidden += 2; 
   }
   else {
+    console.log('bitch you thought'); 
+    setTimeout(() => {
+      flipBack(a);
+      flipBack(b);
+    }, 1000); 
     console.log('no match!')
   }
 }
 
-function checkAndResetClickedButtons() {
-  //if the length of clickedButtons is 2, then check if the two elements on there are the same
-  //if they are then hide those elements from the screen
-  //if they are not do nothing
-  //remove the elements from the clickedButtons queue
-  if (clickedButtons.length === 2) {
-    checkEquality(clickedButtons.queue[0], clickedButtons.queue[1]);
-    clickedButtons.reset(); 
-  }
-
+function checkFirstTwoClickedButtons() {
+  const [ first, second ] = clickedButtons.dismountFirstTwo();
+  checkEquality(first, second);
 }
 
 function generateBoard() {
   const board = document.querySelector('.board');
   for (let i = 0; i < N; i++) {
+    //create a square
     const square = document.createElement('div');
     square.setAttribute('class', 'square');
+    square.setAttribute('id', i);
+    //create a div for the front of the image
+    const front = document.createElement('div');
+    front.setAttribute('class', 'card-front');
+    front.textContent = '⭐︎';
+    //create a div for the back of the image
     const img = document.createElement('div');
-    img.setAttribute('id', i);
+    img.setAttribute('class', 'card-back hidden');
     img.textContent = images[currShuffle[i]];
+    //add eventListener to the square
     square.addEventListener('click', (e) => handleButtonClick(e));
+    //add everything to the dom
+    square.appendChild(front);
     square.appendChild(img);
     board.appendChild(square); 
   }
 }
 
+function flip(e) {
+  console.log('flip', e);
+  const front = e.childNodes[0]; 
+  const back = e.childNodes[1]; 
+  front.classList.add('hidden'); 
+  back.classList.remove('hidden'); 
+}
+
+function flipBack(e) {
+  console.log('flipBack', e); 
+  const front = e.childNodes[0]; 
+  const back = e.childNodes[1];  
+  front.classList.remove('hidden'); 
+  back.classList.add('hidden');
+}
+
+
 function handleButtonClick(e) {
-  const id = e.target.id; 
-  clickedButtons.push(e); 
-  console.log(clickedButtons);
-  checkAndResetClickedButtons();
-  console.log(hidden);
+  //flip and show the image
+  const clickedDiv = e.currentTarget; 
+  console.log(clickedDiv); 
+  flip(clickedDiv); 
+  clickedButtons.push(clickedDiv); 
+
+  //if there are two clicked buttons, check if they are the same
+  if (clickedButtons.length >= 2) {
+    checkFirstTwoClickedButtons(); 
+  }
+ 
   if (hidden === N) {
     console.log('You matched them all!')
     document.querySelector('.hasWon').textContent = 'You matched them all!';
   }
-  return e.target.id; 
+  // return e.target.id; 
 }
 
 function main() {
@@ -78,3 +111,19 @@ function main() {
 } 
 
 window.onload = main; 
+
+//the goal is: 
+//1. when the square is clicked, show the back image
+//2. when 2 squares are clicked and they are the same(they are hidden forever)
+//2. and they are different show the front, hide the back
+
+
+//still need to do:
+//1 disable the click event on the same square ✅
+//1. disable a square once it has been matched 
+//1. add a reset button
+//2. add a timer
+//3. add a score
+//4. add a way to restart the game
+//6. add a way to choose the number of images
+
